@@ -1,6 +1,6 @@
 {
   "name": "amplitude-client",
-  "version": "1.0.30",
+  "version": "1.0.31",
   "description": "A JS library to incorporate Amplitude analytics in your web app.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
