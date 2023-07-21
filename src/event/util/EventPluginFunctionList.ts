@@ -1,5 +1,5 @@
 import * as amplitude from '@amplitude/analytics-browser'
-import { SAVE_EVENT_TO_QUEUE } from '../constants/EventPlugins';
+import { REMOVE_USER_UNTRACKED_PROPERTIES, SAVE_EVENT_TO_QUEUE } from '../constants/EventPlugins';
 
 /**
  * Helper class to store all plugin functions which have been added.
@@ -7,13 +7,12 @@ import { SAVE_EVENT_TO_QUEUE } from '../constants/EventPlugins';
  */
 
 export class EventPluginFunctionList {
-  private static readonly pluginFunctionList: {
+  private static readonly PLUGIN_NAME = 'Combined Plugin'
+  private static pluginFunctionList: {
     [name: string]: (event: amplitude.Types.Event) => amplitude.Types.Event
   } = {}
-  // Added as the last function to save the event to history
-  private static readonly SAVE_EVENT_FUNCTION = SAVE_EVENT_TO_QUEUE
-  private static readonly PLUGIN_NAME = 'Combined Plugin'
   private static isPluginAdded = false
+
 
   static add(pluginFunction: (event: amplitude.Types.Event) => amplitude.Types.Event, name: string): boolean {
     if (name == null) {
@@ -45,6 +44,9 @@ export class EventPluginFunctionList {
   }
 
   static updateAmplitudePlugin() {
+// TODO: wrap around this
+//     setTimeout(asyncFunc, 0)
+// instead of asyncFunc()
     if (EventPluginFunctionList.isPluginAdded) {
       // TODO: Not sure why this causes error (seems like the plugin is not actually there yet)
       amplitude.remove(EventPluginFunctionList.PLUGIN_NAME);
@@ -55,7 +57,9 @@ export class EventPluginFunctionList {
       return {
         name: EventPluginFunctionList.PLUGIN_NAME,
         execute: async (event: amplitude.Types.Event) => {
-          console.log('============Running plugin==========');
+          console.log('============Running plugin user-defined functions==========');
+
+          console.log('User properties: ', event.user_properties);
   
           for (const key in EventPluginFunctionList.pluginFunctionList) {
             if (!EventPluginFunctionList.pluginFunctionList.hasOwnProperty(key)) {
@@ -66,9 +70,13 @@ export class EventPluginFunctionList {
             EventPluginFunctionList.pluginFunctionList[key](event);
           }
   
-          console.log('============Finished running plugin===========');
+          console.log('============Finished running user-defined functions===========');
+          console.log('============Running library-defined functions====================');
   
-          EventPluginFunctionList.SAVE_EVENT_FUNCTION(event);
+          REMOVE_USER_UNTRACKED_PROPERTIES(event);
+          SAVE_EVENT_TO_QUEUE(event);
+
+          console.log('============Finished running library-defined functions===========');
   
           return event;
         },
