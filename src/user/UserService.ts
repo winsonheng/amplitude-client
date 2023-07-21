@@ -23,14 +23,4 @@ export function setUserSite(site: string): void {
   setUserProperty(COMMON_USER_PROPERTIES.SITE, site);
 }
 
-export function setUntrackedProperty(property: string) {
-  UserSettings.setUntrackedProperty(property);
-}
-
-export function setUntrackedProperties(...properties: string[]) {
-  for (const property of properties) {
-    setUntrackedProperty(property);
-  }
-}
-
 //#endregion

@@ -6,7 +6,6 @@ import * as amplitude from '@amplitude/analytics-browser'
 
 export class UserSettings {
   private static defaultPropertyValues: {[property: string]: string} = {}
-  private static untrackedProperties: {[property: string]: string} = {}
 
   static setUserProperty(property: string, defaultValue: string): void {
     UserSettings.defaultPropertyValues[property] = defaultValue;
@@ -20,22 +19,8 @@ export class UserSettings {
     UserSettings.updateUserProperties();
   }
 
-  static setUntrackedProperty(property: string): void {
-    UserSettings.untrackedProperties[property] = property;
-  }
-
-  static removeUntrackedProperty(property: string): void {
-    if (UserSettings.untrackedProperties[property]) {
-      delete UserSettings.untrackedProperties[property];
-    }
-  }
-
   static getDefaultPropertyValues(): {[property: string]: string} {
     return UserSettings.defaultPropertyValues;
-  }
-
-  static getUntrackedProperties(): {[property: string]: string} {
-    return UserSettings.untrackedProperties;
   }
 
   static updateUserProperties(): void {

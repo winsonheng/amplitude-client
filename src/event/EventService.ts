@@ -1,6 +1,6 @@
 import * as amplitude from '@amplitude/analytics-browser'
 import { EventAnalytics } from './analytics/EventAnalytics';
-import { EventPluginFunctionList } from './util/EventPluginFunctionList';
+import { EventPluginManager } from './util/EventPluginManager';
 
 //#region event tracking
 
@@ -8,14 +8,10 @@ export function track(eventName: string, eventProperties?: object): void {
   amplitude.track(eventName, eventProperties);
 }
 
-export function trackToProject(apiKey: string, eventName: string, eventProperties?: object): void {
-  const instance = amplitude.createInstance();
-  instance.init(apiKey);
-  instance.track(eventName, eventProperties);
-}
+//#endregion
 
-//#region event tracking with plugins to modify properties
 
+//#region plugins and functions to modify event properties before they are sent
 
 /**
  * Modifies an event through a user-supplied function whenever an event is tracked.
@@ -24,7 +20,7 @@ export function trackToProject(apiKey: string, eventName: string, eventPropertie
  */
 export function addEventUpdateFunction(executeFunction: (event: amplitude.Types.Event) => amplitude.Types.Event, name?: string): void {
 
-  EventPluginFunctionList.add(executeFunction, name);
+  EventPluginManager.add(executeFunction, name);
 }
 
 /**
@@ -32,7 +28,8 @@ export function addEventUpdateFunction(executeFunction: (event: amplitude.Types.
  * 
  * @param propertyName The Event property to update.
  * @param initValue Initial value for the property.
- * @param updateFunction Function invoked to change an Event's properties. 
+ * @param updateFunction Function invoked to change an Event's properties.
+ * @param name Must be specified if you wish to remove the function later on.
  */
 export function addEventPropertyUpdateFunction<T>(propertyName: string, initValue: T, updateFunction: (before: T) => T, name?: string): void {
   console.log('adding update function');
@@ -54,17 +51,25 @@ export function addEventPropertyUpdateFunction<T>(propertyName: string, initValu
     return event;
   };
 
-  EventPluginFunctionList.add(pluginFunction, name);
+  EventPluginManager.add(pluginFunction, name);
 }
 
-export function removeEventFunction(name: string) {
-  EventPluginFunctionList.remove(name);
+/**
+ * Removes a previously added plugin function.
+ * 
+ * @param name Identifier of the function to remove.
+ */
+export function removeEventFunction(name: string): void {
+  EventPluginManager.remove(name);
 }
 
-export function removeEventPropertyFunction(name: string) {
-  EventPluginFunctionList.remove(name);
+/**
+ * Removes a previously added plugin function.
+ * 
+ * @param name Identifier of the function to remove.
+ */
+export function removeEventPropertyFunction(name: string): void {
+  EventPluginManager.remove(name);
 }
-
-//#endregion
 
 //#endregion

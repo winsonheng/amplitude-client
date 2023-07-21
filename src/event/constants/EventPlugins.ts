@@ -4,27 +4,6 @@ import { UserSettings } from '../../user/util/UserSettings';
 
 
 /**
- * Function called after execution of user-supplied functions to remove 
- * unwanted or sensitive user properties.
- * 
- * @param event Event which has just been tracked.
- * @returns The same event.
- */
-export const REMOVE_USER_UNTRACKED_PROPERTIES =  (event: amplitude.Types.Event): amplitude.Types.Event => {
-    
-    for (const propertyName in UserSettings.getUntrackedProperties()) {
-        if (event[propertyName]) {
-            delete event[propertyName];
-
-            event.event_properties['Removed: ' + propertyName];
-        }
-    }
-
-    return event;
-}
-
-
-/**
  * Final function called in the event plugin's execute method to save the 
  * most recent event of its event type.
  * 
