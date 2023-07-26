@@ -9,29 +9,28 @@ export class UserSettings {
 
   static setUserProperty(property: string, defaultValue: string): void {
     UserSettings.defaultPropertyValues[property] = defaultValue;
-    UserSettings.updateUserProperties();
+
+    const identifyEvent = new amplitude.Identify();
+    
+    identifyEvent.set(property, defaultValue);
+    amplitude.identify(identifyEvent);
+
+    console.log('+++ Adding user property', identifyEvent.getUserProperties(),'+++');
   }
 
-  static removeUserProperty(property: string) {
+  static removeUserProperty(property: string): void {
     if (UserSettings.defaultPropertyValues[property]) {
+      const identifyEvent = new amplitude.Identify();
+
+      identifyEvent.remove(property, UserSettings.defaultPropertyValues[property]);
+      amplitude.identify(identifyEvent);
+      console.log('--- Removing user property', identifyEvent.getUserProperties(), '---');
+
       delete UserSettings.defaultPropertyValues[property];
     }
-    UserSettings.updateUserProperties();
   }
 
   static getDefaultPropertyValues(): {[property: string]: string} {
     return UserSettings.defaultPropertyValues;
-  }
-
-  static updateUserProperties(): void {
-    const identifyEvent = new amplitude.Identify();
-
-    for (const key in UserSettings.defaultPropertyValues) {
-      console.log('Updating User Property ||| Key:', key, 'Value:', UserSettings.defaultPropertyValues[key])
-      identifyEvent.set(key, UserSettings.defaultPropertyValues[key]);
-    }
-  
-    console.log('The user properties you have added: ', identifyEvent.getUserProperties());
-    amplitude.identify(identifyEvent);
   }
 }
