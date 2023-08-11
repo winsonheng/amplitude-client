@@ -28,7 +28,9 @@ Please see [`amplitude-test`](https://github.com/Medios-Technologies/remidio-com
 
 ### Init
 1. Clone this repo
-2. 
+2. `yarn`
+3. cd to the project you want to import this library in
+4. `yarn add amplitude-client@file:"path\to\repo"`
 
 ### Build
 `npx tsc`
