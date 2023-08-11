@@ -1,6 +1,6 @@
 import * as amplitude from '@amplitude/analytics-browser';
 import { EventAnalytics } from '../analytics/EventAnalytics';
-import { UserSettings } from '../../user/util/UserSettings';
+import { UserSettingsManager } from '../../user/util/UserSettingsManager';
 
 
 /**
@@ -23,9 +23,12 @@ export const TIME_ELAPSED_SINCE_LAST_EVENT = (event: amplitude.Types.Event): amp
     // Set to 0 if it is the first event of an event type
     const timeElapsed = lastEvent == null ? 0 : event.time - lastEvent.time;
 
-    console.log('===========The elapsed time is : ', timeElapsed, "================");
+    console.log('The elapsed time is : ', timeElapsed);
 
-    event.event_properties['time_elapsed'] = timeElapsed;
+    event.event_properties = {
+        ...event.event_properties,
+        time_elapsed: timeElapsed
+    };
 
     return event;
 }
@@ -42,7 +45,10 @@ export const COUNT_EVENT_TYPE = (event: amplitude.Types.Event): amplitude.Types.
 
     const eventCount = 1 + (lastEvent == null ? 0 : lastEvent.event_properties['count']);
 
-    event.event_properties['count'] = eventCount;
+    event.event_properties = {
+        ...event.event_properties,
+        count: eventCount
+    };
 
     return event;
 }

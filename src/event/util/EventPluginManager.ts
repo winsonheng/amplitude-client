@@ -6,12 +6,11 @@ import { SAVE_EVENT_TO_QUEUE } from '../constants/EventPlugins';
  * Runs them one by one followed by saveEventToQueue at the end to ensure event is saved only once.
  */
 export class EventPluginManager {
-  private static readonly PLUGIN_NAME = 'Combined Plugin'
+  private static readonly PLUGIN_NAME = 'Master Plugin'
   private static pluginFunctionList: {
     [name: string]: (event: amplitude.Types.Event) => amplitude.Types.Event
   } = {}
-  private static isPluginAdded = false
-  private static addRemoveTaskQueue = Promise.resolve();
+  private static isMasterPluginAdded = false
 
 
   static add(pluginFunction: (event: amplitude.Types.Event) => amplitude.Types.Event, name: string): boolean {
@@ -25,8 +24,6 @@ export class EventPluginManager {
 
     EventPluginManager.pluginFunctionList[name] = pluginFunction;
 
-    EventPluginManager.updateAmplitudePlugin();
-
     return true;
   }
 
@@ -38,91 +35,53 @@ export class EventPluginManager {
 
     delete EventPluginManager.pluginFunctionList[name];
 
-    EventPluginManager.updateAmplitudePlugin();
-
     return true;
   }
 
-  static async updateAmplitudePlugin() {
-// TODO: wrap around this
-//     setTimeout(asyncFunc, 0)
-// instead of asyncFunc()
-  console.log(`//////////////////////////////////////////////////////\n
-  //////////////////////////////////////////////////////\n
-  //////////////////////////////////////////////////////\n
-  //////////////////////////////////////////////////////\n
-  //////////////////////////////////////////////////////\n`);
-    if (EventPluginManager.isPluginAdded) {
-      EventPluginManager.addRemoveTaskQueue = EventPluginManager.addRemoveTaskQueue.then(async () => {
-        console.log(`********************************************\n
-      ********************************************\n
-      ********************************************\n
-      REMOVING PLUGIN
-      ********************************************\n
-      ********************************************\n
-      ********************************************\n`);
-        return await amplitude.remove(EventPluginManager.PLUGIN_NAME).promise.then(() => {
-          console.log(`********************************************\n
-      ********************************************\n
-      ********************************************\n
-      FINISHED REMOVING PLUGIN
-      ********************************************\n
-      ********************************************\n
-      ********************************************\n`);
-        });
-      });
+  /**
+   * Adds a single master plugin that will execute all the plugin functions that have been added
+   */
+  static async initMasterPlugin() {
+    console.log(`//////////////////////////////////////////////////////\n
+    INIT MASTER PLUGIN\n
+    //////////////////////////////////////////////////////\n`);
+    if (EventPluginManager.isMasterPluginAdded) {
+      return;
     }
 
-    const plugin = (): amplitude.Types.EnrichmentPlugin => {
+    EventPluginManager.isMasterPluginAdded = true;
+
+    const masterPlugin = (): amplitude.Types.EnrichmentPlugin => {
   
       return {
         name: EventPluginManager.PLUGIN_NAME,
         execute: async (event: amplitude.Types.Event) => {
-          console.log('============Running plugin user-defined functions==========');
+          console.log('----------------------Running plugin user-defined functions----------------------');
 
-          console.log('User properties: ', event.user_properties);
-  
+          // Execute each of the plugins one by one
           for (const key in EventPluginManager.pluginFunctionList) {
             if (!EventPluginManager.pluginFunctionList.hasOwnProperty(key)) {
-              console.log('This key does not exist: ', key);
               continue;
             }
+
+            console.log('>>>>>>>>    Running plugin function:', key, '  <<<<<<<<');
 
             EventPluginManager.pluginFunctionList[key](event);
           }
   
-          console.log('============Finished running user-defined functions===========');
-          console.log('============Running library-defined functions====================');
+          console.log('----------------------Finished running user-defined functions----------------------');
+          console.log('===================Running library-defined functions====================');
   
           SAVE_EVENT_TO_QUEUE(event);
 
-          console.log('============Finished running library-defined functions===========');
+          console.log('===================Finished running library-defined functions===================');
   
           return event;
         },
       };
     };
 
+    amplitude.add(masterPlugin());
 
-    EventPluginManager.addRemoveTaskQueue = EventPluginManager.addRemoveTaskQueue.then(async () => {
-      console.log(`||||||||||||||||||||||||||||||||||||\n
-    ||||||||||||||||||||||||||||||||||\n
-    ||||||||||||||||||||||||||||||||||\n
-    ADDING PLUGIN
-    ||||||||||||||||||||||||||||||||||\n
-    ||||||||||||||||||||||||||||||||||\n
-    ||||||||||||||||||||||||||||||||||\n`);
-      return await amplitude.add(plugin()).promise.then(() => {
-        console.log(`||||||||||||||||||||||||||||||||||||\n
-    ||||||||||||||||||||||||||||||||||\n
-    ||||||||||||||||||||||||||||||||||\n
-    FINISHED ADDING PLUGIN
-    ||||||||||||||||||||||||||||||||||\n
-    ||||||||||||||||||||||||||||||||||\n
-    ||||||||||||||||||||||||||||||||||\n`);
-      });
-    });
-
-    EventPluginManager.isPluginAdded = true;
   }
 }

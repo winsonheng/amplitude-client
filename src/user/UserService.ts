@@ -1,19 +1,32 @@
 import * as amplitude from '@amplitude/analytics-browser'
-import { UserSettings } from './util/UserSettings';
-import { COMMON_USER_PROPERTIES } from './constants/CommonUserProperties';
+import { UserSettingsManager } from './util/UserSettingsManager';
+import { COMMON_USER_PROPERTIES, DEVICE_TYPE, USER_TYPE } from './constants/CommonUserProperties';
 
 //#region user identification and properties
 
 export function setUserProperty(propertyName: string, defaultValue: string) {
-  // TODO: Use Identify API to allow user to backdate certain event properties
-  UserSettings.setUserProperty(propertyName, defaultValue);
+  UserSettingsManager.setUserProperty(propertyName, defaultValue);
 }
 
 export function removeUserProperty(propertyName: string) {
-  UserSettings.removeUserProperty(propertyName);
+  UserSettingsManager.removeUserProperty(propertyName);
 }
 
-export function setUserType(value: string): void {
+export function setDeviceId(value: string): void {
+  amplitude.setDeviceId(value);
+}
+
+export function setUserId(value: string): void {
+  console.log('Setting user id:', value);
+  amplitude.setUserId(value);
+}
+
+export function setDeviceType(value: DEVICE_TYPE | string): void {
+  console.log(value);
+  setUserProperty(COMMON_USER_PROPERTIES.DEVICE_TYPE, value);
+}
+
+export function setUserType(value: USER_TYPE | string): void {
   setUserProperty(COMMON_USER_PROPERTIES.USER_TYPE, value);
 }
 
