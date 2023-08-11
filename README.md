@@ -1,6 +1,6 @@
 # amplitude-client
-### Build & Publish
-`npm run pub`
+
+Please see [`amplitude-test`](https://github.com/Medios-Technologies/remidio-common-dashboard-frontend/tree/amplitude-test) branch for implementation example.
 
 ### File Structure
 
@@ -25,3 +25,10 @@
     |
     ├── Amplitude.ts                                # Initialize and reset the amplitude client
     └── ...
+
+### Init
+1. Clone this repo
+2. 
+
+### Build
+`npx tsc`
