@@ -32,3 +32,58 @@ Please see [`amplitude-test`](https://github.com/Medios-Technologies/remidio-com
 
 ### Build
 `npx tsc`
+
+### Usage Examples
+#### Initializing Amplitude (Only done once)
+```
+import * as amp from "amplitude-client";
+amp.init(process.env.REACT_APP_AMPLITUDE_API_KEY, amp.LOG_LEVEL.DEBUG);
+```
+
+#### Initialize user properties
+```
+amp.setDeviceType(DEVICE_TYPE.WEB_DASHBOARD);
+amp.setUserType(USER_TYPE.DOCTOR);
+amp.setUserId(email);
+```
+
+#### Track Event
+```
+amp.track("added helper library");
+```
+
+#### Add Pre-defined Plugin
+* Use `addPlugin()` to add a plugin that modifies tracked events directly
+* Use `addPluginWithPropertyFunction()` to add a plugin which modifies **a single event property** based on the given function and its previous value
+
+Adds a property that calculates the time elapsed since the previous event of the same type:
+```
+addPlugin(EventPlugins.TIME_ELAPSED_SINCE_LAST_EVENT, 'time_elapsed');
+```
+
+Appends the HREF value to the event when `amp.track()` is called:
+```
+amp.addPluginWithPropertyFunction('href', amp.EventPropertyPlugins.HREF.INIT_VALUE, amp.EventPropertyPlugins.HREF.FUNCTION, 'href');
+```
+
+#### You can also define your own plugins and property functions.
+
+Deletes a property from tracked events:
+```
+addPlugin((event) => {
+  if (event.event_properties['redacted']) {
+    delete event.event_properties['redacted'];
+  }
+  return event;
+}, 'delete redacted property');
+```
+
+Count number of times a type of event has been tracked:
+```
+addPluginWithPropertyFunction('count', 0, (prev) => prev + 1, 'counter');
+```
+
+#### Remove Plugin
+```
+amp.removePluginFunction('pluginName');
+```
