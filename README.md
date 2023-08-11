@@ -89,3 +89,8 @@ addPluginWithPropertyFunction('count', 0, (prev) => prev + 1, 'counter');
 ```
 amp.removePluginFunction('pluginName');
 ```
+
+#### Anonymise user after they log out
+```
+amp.logout();
+```
