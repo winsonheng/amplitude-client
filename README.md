@@ -1,4 +1,5 @@
 # amplitude-client
+TypeScript wrapper for Amplitude to build data pipelines for product activity & metrics. Automate and monitor your product now!
 
 ### File Structure
 
