@@ -1,7 +1,5 @@
 # amplitude-client
 
-Please see [`amplitude-test`](https://github.com/Medios-Technologies/remidio-common-dashboard-frontend/tree/amplitude-test) branch for implementation example.
-
 ### File Structure
 
     src
