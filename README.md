@@ -16,7 +16,7 @@
     |
     ├── user                                        
     │     ├── constants                             
-    │     │     └── CommonUserProperties.ts         # Enums of default user properties specific to Remidio
+    │     │     └── CommonUserProperties.ts         # Enums of default user properties
     │     ├── util                                  
     │     |     └── UserSettingsManager.ts          # Manages the settings and properties added to the current user
     |     └── UserService.ts                        # Facade for functions related to users
